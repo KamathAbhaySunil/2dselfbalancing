@@ -1,114 +1,131 @@
----
-
-# 📐 Parameter Definition for 2D Self-Balancing Bot in MATLAB
-
-To simulate or control a 2D self-balancing robot (like a cart-pendulum model), you need to define several physical parameters. Here's how to calculate or estimate each one:
+Sure! Here's a professional and clean **`README.md`** for your 2D self-balancing bot MATLAB simulation project. You can copy and paste this into your repository or documentation:
 
 ---
 
-## 🔧 1. Mass of the Cart (`M`)
+# 🤖 2D Self-Balancing Bot Simulation (MATLAB)
 
-Represents the mass of the lower part of the robot (chassis, motors, etc.).
+This project simulates a **2D self-balancing robot** using MATLAB, modeled as an **inverted pendulum on a cart**. The simulation includes system dynamics, state-space modeling, and control using an **LQR** or **PID** controller.
 
-- **Real-world bot**: Weigh the chassis and components below the center of mass.
-- **Simulation**: Estimate a typical value.
+---
 
-```matlab
-M = 0.5; % kg
+## 📌 Features
+
+- Accurate physics-based model of a self-balancing robot  
+- State-space representation of the system  
+- LQR or PID controller for stabilization  
+- Visualization of the robot’s angle and position  
+- Optional animation of the balancing motion
+
+---
+
+## 📁 Project Structure
+
+```bash
+self-balancing-bot/
+│
+├── README.md               # This file
+├── params.m                # Physical parameters of the bot
+├── state_space_model.m     # System dynamics and control design
+├── simulation.m            # Main simulation script
+└── animation.m             # Optional animation script
 ```
 
 ---
 
-## 🔧 2. Mass of the Pendulum (`m`)
+## ⚙️ System Description
 
-Represents the part of the bot that behaves like an inverted pendulum—typically the body above the wheel axis.
+The robot is modeled as a **cart-pendulum system** with four state variables:
 
-- **If simulating**: Use a fraction of total mass.
-- **If real**: Weigh the mass above the wheel axis.
+- `x`: cart position  
+- `x_dot`: cart velocity  
+- `theta`: angle of the pendulum from vertical  
+- `theta_dot`: angular velocity of the pendulum
+
+Control input: **Force applied to the cart (u)**
+
+---
+
+## 🧠 Parameters
+
+These values define the physical characteristics of the bot:
 
 ```matlab
-m = 0.2; % kg
+M = 0.5;        % Mass of cart (kg)
+m = 0.2;        % Mass of pendulum (kg)
+b = 0.1;        % Friction coefficient (N/m/sec)
+l = 0.3;        % Distance to center of mass (m)
+I = (1/3)*m*l^2;% Moment of inertia (kg.m^2)
+g = 9.81;       % Gravitational acceleration (m/s^2)
 ```
 
 ---
 
-## 📏 3. Length to Center of Mass (`l`)
+## 🧮 Control Design
 
-The distance from the pivot point (wheel axle) to the **center of mass** of the upper body (pendulum).
-
-- **Estimate**: Assume halfway up the bot if uniform.
-- For a robot of height `H`:  
-  \[
-  l = \frac{H}{2}
-  \]
+### ✅ LQR Controller
+Linear Quadratic Regulator minimizes state error and control effort using:
 
 ```matlab
-l = 0.3; % meters (for a ~60 cm tall robot)
+Q = diag([10, 1, 10, 1]);
+R = 0.01;
+K = lqr(A, B, Q, R);
+```
+
+### ⚙️ PID Controller (Optional)
+For simple angular control, PID can be applied to `theta` directly (not covered in this repo yet).
+
+---
+
+## 🚀 How to Run
+
+1. Clone the repo or download the files.
+2. Open MATLAB and run the scripts in order:
+
+```matlab
+run('params.m')             % Define physical constants
+run('state_space_model.m')  % Generate system and controller
+run('simulation.m')         % Simulate the robot's behavior
+run('animation.m')          % Visualize balancing (optional)
 ```
 
 ---
 
-## 🌀 4. Moment of Inertia (`I`)
+## 🎞 Output Example
 
-Inertia of the pendulum around the pivot point. For a rod or rectangular body pivoting at the bottom:
-
-\[
-I = \frac{1}{3} m \cdot l^2
-\]
-
-- Use CAD software (SolidWorks, Fusion360) for complex shapes.
-
-```matlab
-I = (1/3) * m * l^2; % kg·m²
-```
+- **Angle vs Time**
+- **Cart Position vs Time**
+- **Animated motion of pendulum-cart system**
 
 ---
 
-## ⚙️ 5. Friction Coefficient (`b`)
+## 🔬 Research Applications
 
-Represents viscous damping from wheel and motor friction.
-
-- **Difficult to measure** directly—use small value and tune.
-- Increase if the system oscillates too much in simulation.
-
-```matlab
-b = 0.1; % N/m/sec
-```
+- Testing multi-IMU sensor fusion for stability  
+- Comparing PID vs LQR performance  
+- Training reinforcement learning agents to self-tune gains  
+- Basis for 3D spherical balancing bots (3-wheeled ball bot)
 
 ---
 
-## 🌍 6. Gravity (`g`)
+## 📚 References
 
-Standard gravitational acceleration on Earth:
-
-```matlab
-g = 9.81; % m/s^2
-```
+- [MATLAB Inverted Pendulum Example – MathWorks Docs](https://www.mathworks.com/help/control/ug/inverted-pendulum.html)
+- Feedback Systems: An Introduction for Scientists and Engineers – Åström & Murray
 
 ---
 
-## ✅ Example Parameter Block
+## 🧑‍🔬 Author
 
-```matlab
-M = 0.5;       % Mass of cart (kg)
-m = 0.2;       % Mass of pendulum (kg)
-b = 0.1;       % Coefficient of friction (N/m/sec)
-l = 0.3;       % Length to pendulum center of mass (m)
-I = (1/3)*m*l^2; % Moment of inertia (kg·m²)
-g = 9.81;      % Gravity (m/s^2)
-```
+Developed by Kamath Abhay Sunil
+Department of Electrical Engineering, RV College of Engineering  
+Inspired by real-world robotic stability problems and balancing bots.
 
 ---
 
-## 🛠 How to Measure for a Real Bot
+## 📜 License
 
-| **Parameter** | **How to Obtain**                              |
-|---------------|------------------------------------------------|
-| `M`, `m`       | Weigh components separately using a scale      |
-| `l`            | Measure vertical distance from axle to CoM     |
-| `I`            | Estimate from shape or use CAD calculation     |
-| `b`            | Estimate by observing slowing motion or tune   |
+MIT License – feel free to use and modify!
 
 ---
 
-Let me know if you'd like this exported as a PDF, or embedded into a LaTeX report!
+Let me know if you'd like to include figures, equations, or export this as a PDF or GitHub-style `README.md`!
